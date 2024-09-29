@@ -31,6 +31,30 @@ const hardware ={
     },
     pages:(req,res)=>{
         res.render('pages');
+    },
+    admin:(req,res)=>{
+        res.render('adminhome');
+    },
+    adminproduct:(req,res)=>{
+        res.render('adminproduct');
+    },
+    adminorders:(req,res)=>{
+        res.render('adminorders');
+    },
+    adminordersongoing:(req,res)=>{
+        res.render('adminprocess');
+    },
+    adminordesofd:(req,res)=>{
+        res.render('adminOFD');
+    },
+    adminordersdone:(req,res)=>{
+        res.render('admindone');
+    },
+    adminuser:(req,res)=>{
+        res.render('adminuser');
+    },
+    admincontact:(req,res)=>{
+        res.render('admincontact');
     }
 }
 
