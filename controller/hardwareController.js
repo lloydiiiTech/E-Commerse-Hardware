@@ -31,6 +31,9 @@ const hardware ={
     },
     pages:(req,res)=>{
         res.render('pages');
+    },
+    place_order:(req,res)=>{
+        res.render('place_order');
     }
 }
 

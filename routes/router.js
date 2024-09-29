@@ -14,5 +14,6 @@ router.get('/contact',hardware.contact);
 router.get('/cart',hardware.cart);
 router.get('/login',hardware.login);
 router.get('/pages',hardware.pages);
+router.get('/place_order',hardware.place_order);
 
 module.exports = router;

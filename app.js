@@ -8,6 +8,6 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({extended:true}));
 app.use('/',routes);
 
-app.listen(4500,()=>{
-    console.log('server initialized on http://localhost:4500');
+app.listen(3003,()=>{
+    console.log('server initialized on http://localhost:3003');
 });
