@@ -4,17 +4,28 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+<<<<<<< HEAD
     "start": "nodemon app.js"
+=======
+    "start": "nodemon, app.js"
+>>>>>>> 4ab7021ef334343db14e4b36b6aee0b1c513a1c0
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+<<<<<<< HEAD
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
     "ejs": "^3.1.10",
     "express": "^4.21.0",
+=======
+    "body-parser": "^1.20.3",
+    "ejs": "^3.1.10",
+    "express": "^4.21.0",
+    "express-flash": "^0.0.2",
+>>>>>>> 4ab7021ef334343db14e4b36b6aee0b1c513a1c0
     "express-session": "^1.18.0",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.11.3",
