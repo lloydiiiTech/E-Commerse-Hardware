@@ -1,0 +1,31 @@
+
+    <div class="container mt-5">
+        <h1>Order Confirmation</h1>
+        <div class="alert alert-success">
+            <p>Thank you for your order!</p>
+        </div>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total Price</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% orders.forEach(order => { %>
+                <tr>
+                    <td><%= order.ProductName %></td>
+                    <td><%= order.Quantity %></td>
+                    <td>$<%= order.Price %></td>
+                    <td>$<%= order.total_price %></td>
+                    <td><%= order.Status %></td>
+                </tr>
+                <% }) %>
+            </tbody>
+        </table>
+        <a href="/homepage/<%= userId %>" class="btn btn-primary mt-4">Back to Homepage</a>
+    </div>
+  

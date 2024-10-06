@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout Confirmation</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Thank You for Your Purchase!</h1>
+        <p>Your order has been processed successfully.</p>
+
+        <!-- Table for receipt items -->
+        <h3>Your Receipt</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (receiptItems && receiptItems.length > 0) { %>
+                    <% receiptItems.forEach(item => { %>
+                        <tr>
+                            <td><%= item.ProductName %></td>
+                            <td><%= item.Quantity %></td>
+                            <td>$<%= Number(item.Price).toFixed(2) %></td>
+                            <td>$<%= (Number(item.Price) * item.Quantity).toFixed(2) %></td>
+                        </tr>
+                    <% }) %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="4" class="text-center">No items found in your receipt.</td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+
+        <a href="/homepage/<%= userId %>" class="btn btn-primary mt-4">Back to Homepage</a>
+    </div>
+</body>
+</html>

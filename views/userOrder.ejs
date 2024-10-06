@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Order Confirmation</h1>
+        <div class="alert alert-success">
+            <p>My History Products Order</p>
+        </div>
+        
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total Price</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% orderProducts.forEach(order => { %> <!-- Changed orders to orderProducts -->
+                <tr>
+                    <td><%= order.ProductName %></td>
+                    <td><%= order.Quantity %></td>
+                    <td>$<%= order.Price %></td>
+                    <td>$<%= order.total_price %></td>
+                    <td><%= order.Status %></td>
+                </tr>
+                <% }) %>
+            </tbody>
+        </table>
+        
+        <a href="/homepage/<%= userId %>" class="btn btn-primary mt-4">Back to Homepage</a>
+    </div>
+</body>
+</html>

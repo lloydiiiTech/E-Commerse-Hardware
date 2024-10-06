@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/font-awesome.min.css" type="text/css">  
+    <link rel="stylesheet" href="../css/style.css" type="text/css">
+    <title>Hardware Ecommerce</title>
+</head>
+<body>
+
+<section class="breadcrumb-section" style="background-image: url('/img/breadcrumb.jpg'); background-repeat: no-repeat; background-size: cover; background-position: center;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center p-5">
+                <div class="breadcrumb__text">
+                    <h2 style="color: aliceblue;">Product Details</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container mt-5" style="border:  3px solid #be430a;">
+    <div class="m-5">
+    <h1><%= product.ProductName %></h1>
+    <div class="row">
+        <div class="col-md-6">
+            <img src="<%= product.Picture %>" class="img-fluid" alt="Product Image">
+        </div>
+        <div class="col-md-6">
+            <p><strong>Description:</strong> <%= product.Description %></p>
+            <p><strong>Price per unit:</strong> $<%= product.Price %></p>
+            <p><strong>Total Price:</strong> $<span id="totalPrice"><%= product.Price %></span></p> <!-- Display dynamic price -->
+            
+            <form action="/cart/add" method="POST"> <!-- Update to match your route -->
+                <input type="hidden" name="user_id" value="<%= userId %>"> <!-- Use the passed userId -->
+                <input type="hidden" name="product_id" value="<%= product.ProductID %>"> <!-- Use product ID -->
+                
+                <div class="form-group">
+                    <label for="quantity">Quantity</label>
+                    <input type="number" id="quantity" name="quantity" class="form-control" style="width: 100px;" required>
+                </div>
+            
+                <button type="submit" class="btn btn-primary">Add to Cart</button>
+            </form>
+            <script>
+                const productPrice = parseFloat("<%= product.Price %>"); 
+                const quantityInput = document.getElementById('quantity');
+                const totalPriceElement = document.getElementById('totalPrice');
+            
+                // Update total price when quantity changes
+                quantityInput.addEventListener('input', function() {
+                    const quantity = parseInt(this.value) || 1; // Default to 1 if the value is invalid
+                    const totalPrice = productPrice * quantity;
+                    totalPriceElement.textContent = totalPrice.toFixed(2); // Update total price display
+                });
+            </script>
+
+            
+        </div>
+    </div>
+    <a href="/homepage/<%= userId %>" class="btn btn-secondary mt-4 ">Back to Products</a>
+</div>
+</div>
+
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+   

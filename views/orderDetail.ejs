@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Order Details</h1>
+        <div class="alert alert-info">
+            <p>Product Name: <%= order.ProductName %></p>
+            <p>Quantity: <%= order.Quantity %></p>
+            <p>Price: $<%= order.Price %></p>
+            <p>Status: <%= order.Status %></p>
+        </div>
+        <a href="/orders" class="btn btn-primary mt-4">Back to Orders</a>
+    </div>
+</body>
+</html>

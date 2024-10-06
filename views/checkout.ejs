@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Checkout</h1>
+        <h2>User Details</h2>
+        <p>Name: <%= userDetails.FirstName %> <%= userDetails.LastName %></p>
+        <p>Email: <%= userDetails.Email %></p>
+        <p>Contact: <%= userDetails.ContactNumber %></p>
+
+        <h2>Selected Items</h2>
+        <form action="/place-order/<%= userDetails.Id %>" method="POST">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Image</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% let totalAmount = 0; %>
+                    <% cartItems.forEach(item => { %>
+                        <tr>
+                            <td><%= item.ProductName %></td>
+                            <td><img src="<%= item.Picture %>" alt="Product Image" style="width: 50px; height: 50px;"></td>
+                            <td><%= item.Quantity %></td>
+                            <td>$<%= item.Price.toFixed(2) %></td>
+                            <td>$<%= (item.Price * item.Quantity).toFixed(2) %></td>
+                        </tr>
+                        <% totalAmount += item.Price * item.Quantity; %>
+                    <% }) %>
+                </tbody>
+            </table>
+
+            <h3>Total Amount: $<%= totalAmount.toFixed(2) %></h3>
+
+            <!-- Hidden input to submit user ID -->
+            <input type="hidden" name="userId" value="<%= userDetails.Id %>">
+
+            <div class="text-right">
+                <button type="submit" class="btn btn-primary">Place Order</button>
+            </div>
+        </form>
+
+        <a href="/homepage/<%= userDetails.Id %>" class="btn btn-secondary mt-3">Back to Shopping</a>
+    </div>
+</body>
+</html>
