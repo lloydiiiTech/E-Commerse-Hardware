@@ -1,10 +1,13 @@
-// controllers/AdminController.js
-const Product = require('../models/AdminModels');
 const multer = require('multer');
 const path = require('path');
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
-const ExcelJS = require('exceljs'); // Make sure this line is present
+const ExcelJS = require('exceljs'); 
+
+
+const Product = require('../models/ProductModels');
+const Inventory = require('../models/InventoryModels');
+const Orders = require('../models/OrderModels');
 
 
 // Configure multer storage directly in the controller
@@ -21,11 +24,9 @@ const storage = multer.diskStorage({
     }
 });
 
-// Initialize multer with the defined storage
 const upload = multer({ storage }).single('Picture');
 
-// Controller to handle adding a product
-// Controller to handle adding a product
+
 const adminaddproduct = (req, res) => {
     upload(req, res, async (err) => {
         if (err) {
@@ -56,7 +57,7 @@ const adminaddproduct = (req, res) => {
             const result = await Product.addProduct(productData);
             
             // Insert into tblprodinv
-            await Product.insertIntoInventory({
+            await Inventory.insertIntoInventory({
                 ProductName,
                 Quantity: NumberOfStock,
                 Changes_type: 'New Product',
@@ -73,9 +74,10 @@ const adminaddproduct = (req, res) => {
 };
 
 const adminproduct = async(req, res) => {
+    const adminId = req.params.id;
     try {
         const products = await Product.getAllProducts(); // Fetch products from the model
-        res.render('adminproduct', { products }); // Render the view with the products
+        res.render('adminproduct', { products, adminId}); // Render the view with the products
     } catch (error) {
         console.error('Error fetching products:', error);
         res.status(500).send('Server error while fetching products');
@@ -136,7 +138,7 @@ const updateproduct = async (req, res) => {
         req.flash('error', 'Server error while updating product');
         res.redirect(`/updateproduct/${id}`);
     }
-};
+};  
 
 
 
@@ -168,7 +170,8 @@ const admin = (req, res) => {
 
 
 const adminadproduct = (req, res) => {
-    res.render('adminaddproduct');
+    const adminId = req.params.id;
+    res.render('adminaddproduct', {adminId});
 };
 
 
@@ -224,10 +227,10 @@ const restockProduct = async (req, res) => {
         await Product.updateProductStock(ProductName, Quantity, "Restock");
 
         // Insert into inventory using the Product model
-        await Product.insertIntoInventory({
+        await Inventory.insertIntoInventory({
             ProductName,
             Quantity, // Use Quantity from the request body
-            Changes_type: 'New Product', // Type of change
+            Changes_type: 'Restock', // Type of change
             Date: new Date() // Current date for the transaction
         });
 
@@ -245,7 +248,7 @@ const restockProduct = async (req, res) => {
 
 const fetchPendingOrders = async (req, res) => {
     try {
-        const orders = await Product.getOrders("Pending");
+        const orders = await Orders.getOrders("Pending");
         res.render('adminorders', { orders });
     } catch (err) {
         console.error('Error retrieving pending orders:', err);
@@ -260,10 +263,10 @@ const acceptOrder = async (req, res) => {
 
     try {
         // Update the order status to 'On-going'
-        await Product.updateOrderStatus(orderID, "On-going");
+        await Orders.updateOrderStatus(orderID, "On-going");
         
         // Fetch order details
-        const orderDetails = await Product.getOrderDetails(orderID);
+        const orderDetails = await Orders.getOrderDetails(orderID);
         console.log('Fetched Order Details:', orderDetails); // Debugging line
         
         if (!orderDetails) {
@@ -330,7 +333,7 @@ const acceptOrder = async (req, res) => {
 
 const fetchProcessOrders = async (req, res) => {
     try {
-        const orders = await Product.getOrders("On-going");
+        const orders = await Orders.getOrders("On-going");
         res.render('adminprocess', { orders });
     } catch (err) {
         console.error('Error retrieving pending orders:', err);
@@ -341,7 +344,7 @@ const fetchProcessOrders = async (req, res) => {
 const outforDelivery = async (req, res) => {
     const orderID = req.params.id; // Get order ID from the route parameter
     try {
-        await Product.updateOrderStatus(orderID, "Out-for-Delivery");
+        await Orders.updateOrderStatus(orderID, "Out-for-Delivery");
         res.redirect('/on-going'); // After updating, redirect back to the ongoing orders page
     } catch (err) {
         console.error('Error updating order status:', err);
@@ -354,7 +357,7 @@ const outforDelivery = async (req, res) => {
 
 const fetchOFDOrders = async (req, res) => {
     try {
-        const orders = await Product.getOrders("Out-for-Delivery");
+        const orders = await Orders.getOrders("Out-for-Delivery");
         res.render('adminOFD', { orders });
     } catch (err) {
         console.error('Error retrieving pending orders:', err);
@@ -365,13 +368,13 @@ const updatetoDone = async (req, res) => {
     const orderID = req.params.id; // Get order ID from the route parameter
     try {
         // Update the order status to 'Done'
-        await Product.updateOrderStatus(orderID, "Done");
+        await Orders.updateOrderStatus(orderID, "Done");
 
         // Fetch order details to insert into the inventory
-        const orderDetails = await Product.getinvetDetails(orderID);
+        const orderDetails = await Orders.getinvetDetails(orderID);
 
         // Insert into `tblprodinv` (Inventory) with negative quantity for sales
-        await Product.insertIntoInventory({
+        await Inventory.insertIntoInventory({
             ProductName: orderDetails.ProductName,
             Quantity: -orderDetails.Quantity, // Save as negative to indicate a sale
             Changes_type: 'Sale',
@@ -393,7 +396,7 @@ const updatetoDone = async (req, res) => {
 const CancelPending = async (req, res) => {
     const orderID = req.params.id; // Get order ID from the route parameter
     try {
-        await Product.updateOrderStatus(orderID, "Cancel");
+        await Orders.updateOrderStatus(orderID, "Cancel");
         res.redirect('/orders'); // After updating, redirect back to the ongoing orders page
     } catch (err) {
         console.error('Error updating order status:', err);
@@ -403,7 +406,7 @@ const CancelPending = async (req, res) => {
 const CancelProcess = async (req, res) => {
     const orderID = req.params.id; // Get order ID from the route parameter
     try {
-        await Product.updateOrderStatus(orderID, "Cancel");
+        await Orders.updateOrderStatus(orderID, "Cancel");
         res.redirect('/on-going'); // After updating, redirect back to the ongoing orders page
     } catch (err) {
         console.error('Error updating order status:', err);
@@ -413,7 +416,7 @@ const CancelProcess = async (req, res) => {
 const CancelOFD = async (req, res) => {
     const orderID = req.params.id; // Get order ID from the route parameter
     try {
-        await Product.updateOrderStatus(orderID, "Cancel");
+        await Orders.updateOrderStatus(orderID, "Cancel");
         res.redirect('/ofd'); // After updating, redirect back to the ongoing orders page
     } catch (err) {
         console.error('Error updating order status:', err);
@@ -423,7 +426,7 @@ const CancelOFD = async (req, res) => {
 
 const fetchDONEOrders = async (req, res) => {
     try {
-        const orders = await Product.getOrders("Done");
+        const orders = await Orders.getOrders("Done");
         res.render('admindone', { orders });
     } catch (err) {
         console.error('Error retrieving pending orders:', err);
@@ -438,13 +441,13 @@ const Refund = async (req, res) => {
     
     try {
         // Update the order status to 'Done'
-        await Product.updateOrderStatus(orderID, "Refund");
+        await Orders.updateOrderStatus(orderID, "Refund");
 
         // Fetch order details to insert into the inventory
-        const orderDetails = await Product.getinvetDetails(orderID);
+        const orderDetails = await Orders.getinvetDetails(orderID);
 
         // Insert into `tblprodinv` (Inventory) with negative quantity for sales
-        await Product.insertIntoInventory({
+        await Inventory.insertIntoInventory({
             ProductName: orderDetails.ProductName,
             Quantity: orderDetails.Quantity, // Save as negative to indicate a sale
             Changes_type: 'Refund',
@@ -465,7 +468,7 @@ const Refund = async (req, res) => {
 
 const fetchREFUNDOrders = async (req, res) => {
     try {
-        const orders = await Product.getREfundStatus();
+        const orders = await Orders.getREfundStatus();
         res.render('adminrefund', { orders });
     } catch (err) {
         console.error('Error retrieving pending orders:', err);
@@ -478,7 +481,7 @@ const fetchREFUNDOrders = async (req, res) => {
 const fetchInventory = async (req, res) => {
     const searchQuery = req.query.search || '';
     try {
-        const inventory = await Product.getInventory(searchQuery);
+        const inventory = await Inventory.getInventory(searchQuery);
         res.render('admininventory', { inventory });
     } catch (err) {
         console.error('Error fetching inventory:', err);
@@ -491,7 +494,7 @@ const downloadInventory = async (req, res) => {
         console.log('Search query:', searchQuery); // Log the search query
 
         // Fetch inventory based on search query
-        const inventory = await Product.downloadInventory(searchQuery);
+        const inventory = await Inventory.downloadInventory(searchQuery);
         console.log('Fetched inventory:', inventory); // Log the fetched inventory
 
         const workbook = new ExcelJS.Workbook();
@@ -530,7 +533,7 @@ const downloadInventory = async (req, res) => {
 
 const clearInventory = async (req, res) => {
     try {
-        await Product.clearInventory();
+        await Inventory.clearInventory();
         req.flash('success', 'Inventory cleared successfully!');
         res.redirect('/inventory');
     } catch (err) {
@@ -541,17 +544,18 @@ const clearInventory = async (req, res) => {
 
 
 const getSalesData = (req, res) => {
-    Product.getSalesData((err, results) => {
+    const adminId = req.params.id;
+    Inventory.getSalesData((err, results) => {
         if (err) {
             return res.status(500).json({ error: 'Database query failed' });
         }
         // Render the view without sending data here
-        res.render('adminhome'); // Render the admin home view
+        res.render('adminhome', { adminId });
     });
 };
 
 const fetchSalesData = (req, res) => {
-    Product.getSalesData((err, results) => {
+    Inventory.getSalesData((err, results) => {
         if (err) {
             return res.status(500).json({ error: 'Database query failed' });
         }
