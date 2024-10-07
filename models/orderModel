@@ -1,0 +1,15 @@
+// models/orderModel.js
+
+const db = require('../config/db.js');
+
+const OrderModel = {
+    
+    placeOrder: (quantity, idNum, productId, userId, callback) => {
+        const query = 'INSERT INTO tblorders (Quantity, IdNum, ProductID, Status, UserID) VALUES (?, ?, ?, "Pending", ?)';
+        db.query(query, [quantity, idNum, productId, userId], (error, results) => {
+            callback(error, results);
+        });
+    }
+};
+
+module.exports = OrderModel;

@@ -1,0 +1,116 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hardware Store</title>
+    <style>
+      
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        h1{
+            font-family: 'Times New Roman';
+            margin-left: 30px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 50px;
+            padding-left: 150px;
+            padding-right: 150px;
+            background-color: #e0851d;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .product-item {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .product-item img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        .product-details {
+            margin: 10px 0;
+        }
+
+        .product-actions {
+            margin-top: 10px;
+        }
+
+        .product-actions button {
+            color: #cf9f5f;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .product-actions button:hover {
+            text-decoration: underline;
+        }
+
+       
+        @media (max-width: 768px) {
+            .product-list {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .product-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Product List</h1>
+    <a href="/cart" class="cart-link">View Cart</a> 
+    <a href="/checkout" class="cart-link">Orders</a> 
+    <div class="container">
+        <div class="product-list">
+            <% products.forEach(product => { %>
+                <div class="product-item">
+                    <img src="<%= product.Picture %>" alt="<%= product.ProductName %> Image">
+                    <div class="product-details">
+                        <strong><%= product.ProductName %></strong><br>
+                        Price: P<%= product.Price %><br>
+                        Stock: <%= product.NumberOfStock %><br>
+                        Description: <%= product.Description %><br>
+                    </div>
+                    <hr>
+                    <div class="product-actions">
+                        <form action="/add/cart/<%= product.ProductID %>" method="POST">
+                            <input type="hidden" name="IdNum" value="1">
+                            <input type="number" name="Quantity" value="1" min="1" required>
+                            <button type="submit">Add to Cart</button>
+                        </form>
+                        <form action="/checkout/<%= product.ProductID %>">
+                            <button>Checkout</button>
+                        </form>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</body>
+</html>

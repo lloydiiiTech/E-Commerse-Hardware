@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="../css/font-awesome.min.css" type="text/css">  
+    <link rel="stylesheet" href="../css/style.css" type="text/css">
+    <title>Cart</title>
+    <style>
+        /* Basic styles for table and layout */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container-cart {
+            max-width: 1000px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .product-row {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .product-row img {
+            width: 100px;
+            height: auto;
+            margin-right: 20px;
+        }
+        .product-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-left: -80px;
+        }
+        .product-actions {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+        }
+        .checkout-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .checkout-btn:hover {
+            background-color: #218838;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+   
+  <!-- Header Section Begin -->
+  <header class="header">
+    <div class="header__top">
+        <div class="container-fluid pr-5 pl-5">
+            <div class="row">
+                <div class="col-lg-6 col-md-6">
+                    <div class="header__top__left">
+                        <ul>
+                            <li><i class="fa fa-envelope"></i> fayshinghardware@gmail.com</li>
+                            
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <div class="header__top__right">
+                        <div class="header__top__right__social">
+                            <a href="#"><i class="fa fa-facebook"></i></a>
+                            <a href="#"><i class="fa fa-twitter"></i></a>
+                            <a href="#"><i class="fa fa-linkedin"></i></a>
+                            <a href="#"><i class="fa fa-pinterest-p"></i></a>
+                        </div>
+                        
+                        <div class="header__top__right__auth">
+                            <a href="/login"><i class="fa fa-user"></i> Login</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-2">
+                <div class="header__logo">
+                    <a href="/index"><img src="images/logo.png" alt=""></a>
+                </div>
+            </div>
+            <div class="col-lg-10">
+                <nav class="header__menu">
+                    <ul>
+                        <li ><a href="/index">Home</a></li>
+                        <li><a href="/shop">Shop</a></li>
+                        <li><a href="/pages">Pages</a>
+                            <ul class="header__menu__dropdown">
+                                <li><a href="/shop_details">Shop Details</a></li>
+                                <li> <a href="/cart" class="cart-link">Shopping Cart</a></li>
+                                <li><a href="/check_out">Check Out</a></li>
+                                <li><a href="/blog_details">Blog Details</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="/contact">Contact</a></li>
+                        <li><a href="/place_order">My Purchases</a></li>
+
+                       <div class="header__cart" style="margin-top:-60;">
+                                <ul>
+                                    <li><a href="cart"><i class="fa fa-shopping-bag"></i> <span>3</span></a></li>
+                                </ul>
+                         </div>
+                           
+                    </ul>
+                </nav>
+            </div>
+       
+        <div class="humberger__open">
+            <i class="fa fa-bars"></i>
+        </div> </div>
+    </div>
+</header>
+<!-- Header Section End -->
+
+<section class="breadcrumb-section" style="background-image: url('/images/breadcrumb.jpg'); background-repeat: no-repeat; background-size: cover; background-position: center;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center p-5">
+                <div class="breadcrumb__text">
+                    <h2 style="color: aliceblue;">Cart</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+    <div class="container-cart">
+        <% if (cartItems && cartItems.length > 0) { %> 
+            <form id="checkoutForm" action="/checkout" method="POST" onsubmit="return validateCheckout()">
+                <% cartItems.forEach(item => { %>
+                    <div class="product-row">
+                        <div>
+                            <input style="width: 50px;" type="checkbox" name="selectedProducts" value="<%= item.CartID %>" onchange="toggleQuantityInput(this)">
+                        </div>
+                        <div>
+                            <img style="width: 300px;" src="<%= item.Picture %>" alt="<%= item.ProductName %>">
+                        </div>
+                        <div class="product-info">
+                            <strong><%= item.ProductName %></strong>
+                            <p>Price: P<%= parseFloat(item.Price).toFixed(2) %></p> 
+                            <p>Total Price: <span class="total-price" id="total-price-<%= item.CartID %>">$<%= (parseFloat(item.Price) * item.Quantity).toFixed(2) %></span></p>
+                        </div>
+                        <div class="product-actions">
+                            <input type="text" name="ProductID[<%= item.CartID %>]" value="<%= item.ProductID %>" hidden>
+                            <input type="number" name="quantities[<%= item.CartID %>]" value="<%= item.Quantity %>" min="1" required 
+                                onchange="updateTotal(this, parseFloat('<%= item.Price %>'))" disabled>
+                            <a href="/cart/delete/<%= item.CartID %>" onclick="return confirm('Are you sure you want to delete this item?');">Delete</a>
+                        </div>
+                    </div>
+                <% }) %>
+                <button type="submit" class="checkout-btn">Proceed to Checkout</button>
+                <div class="error-message" id="error-message" style="display:none;"></div>
+            </form>
+        <% } else { %>
+            <p>Your cart is empty.</p>
+        <% } %>
+    </div>
+
+    <script>
+        function toggleQuantityInput(checkbox) {
+            const quantityInput = checkbox.closest('.product-row').querySelector('input[type="number"]');
+            quantityInput.disabled = !checkbox.checked; // Disable the quantity input if not checked
+        }
+
+        function updateTotal(quantityInput, price) {
+            const quantity = Number(quantityInput.value);
+            const totalPrice = (price * quantity).toFixed(2); 
+            const cartId = quantityInput.closest('.product-row').querySelector('.total-price').id.split('-')[2]; 
+            document.getElementById(`total-price-${cartId}`).textContent = `$${totalPrice}`; 
+        }
+
+        function validateCheckout() {
+            const checkboxes = document.querySelectorAll('input[name="selectedProducts"]:checked');
+            const errorMessage = document.getElementById('error-message');
+            
+            if (checkboxes.length === 0) {
+                errorMessage.textContent = 'No items selected for checkout.';
+                errorMessage.style.display = 'block';
+                return false; // Prevent form submission
+            } else {
+                errorMessage.style.display = 'none';
+                return true; // Allow form submission
+            }
+        }
+    </script>
+     <!-- Footer Section Begin -->
+<footer class="footer spad">
+    <div class="container-fluid pl-5 pr-5">
+        <div class="row">
+            <div class="col-lg-3 col-md-5 col-sm-5 pl-5">
+                <div class="footer__about">
+                    <div class="footer__about__logo">
+                        <a href="/index"><img src="images/logo.png" style="border-radius: 50px;" alt=""></a>
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-1 col-sm-1 pl-1">
+                <div class="footer__about">
+                   
+                    <ul>
+                        <li>Address: Calapan City, Oriental Mindoro</li>
+                        <li>Phone: +65 11.188.888</li>
+                        <li>Email: hardware@gmail.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-1 col-sm-1 offset-lg-1">
+                <div class="footer__widget">
+                    <h6>Useful Links</h6>
+                    <ul>
+                        <li><a href="/about">About Us</a></li>
+            
+
+                        <li><a href="/contact">Contact</a></li>
+       
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-6 pr-2">
+                <div class="footer__widget">
+                    <h6>Join Our Newsletter Now</h6>
+                    <p>Get E-mail updates about our latest shop and special offers.</p>
+                    
+                    <div class="footer__widget__social">
+                        <a href="#"><i class="fa fa-facebook"></i></a>
+                        <a href="#"><i class="fa fa-instagram"></i></a>
+                        <a href="#"><i class="fa fa-twitter"></i></a>
+                        <a href="#"><i class="fa fa-pinterest"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="footer__copyright "style="text-align:center;">
+                   
+Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This ecommerce is made with <i class="fa fa-heart" aria-hidden="true"></i> 
+<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p></div>
+              
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- Footer Section End -->
+</body>
+</html>

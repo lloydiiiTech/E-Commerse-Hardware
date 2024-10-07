@@ -1,0 +1,42 @@
+// controllers/cartController.js
+
+const OrderModel = require('../models/orderModel'); // Add this line
+const ProductModel = require('../models/productModel');
+
+const checkoutCart = (req, res) => {
+    const selectedCartIds = req.body.selectedProducts;
+    const quantities = req.body.quantities; // Get quantities from the form
+
+    if (!selectedCartIds || selectedCartIds.length === 0) {
+        return res.status(400).send('No items selected for checkout.');
+    }
+
+    // Assuming a user ID for this example; replace with actual session handling
+    const userId = 1;
+
+    // Retrieve selected cart items
+    ProductModel.getSelectedCartItems(selectedCartIds, (err, cartItems) => {
+        if (err) {
+            return res.status(500).send('Error retrieving selected cart items.');
+        }
+
+        // Update each cart item with the new quantity
+        cartItems.forEach(item => {
+            item.Quantity = quantities[item.CartID] ? Number(quantities[item.CartID]) : 1; // Default to 1 if undefined
+        });
+
+        // Retrieve user details
+        ProductModel.getUserDetails(userId, (userErr, userDetails) => {
+            if (userErr) {
+                return res.status(500).send('Error retrieving user details.');
+            }
+
+            // Render checkout page with updated cart items and user details
+            res.render('checkout', { cartItems, userDetails });
+        });
+    });
+};
+
+
+
+module.exports = { checkoutCart };

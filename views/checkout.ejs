@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="../css/font-awesome.min.css" type="text/css">  
+    <link rel="stylesheet" href="../css/style.css" type="text/css">
+    <title>Hardware Ecommerce</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container-checkout {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+        }
+        h1, h2, h3 {
+            color: #ff5722;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ccc;
+        }
+        th {
+            background-color: #f9f9f9;
+        }
+        .total-price {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-top: 20px;
+            text-align: right;
+        }
+        .none {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #ff5722;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+        }
+        .none:hover {
+            background-color: #e64a19;
+        }
+    </style>
+</head>
+<body>
+     <!-- Header Section Begin -->
+     <header class="header">
+        <div class="header__top">
+            <div class="container-fluid pr-5 pl-5">
+                <div class="row">
+                    <div class="col-lg-6 col-md-6">
+                        <div class="header__top__left">
+                            <ul>
+                                <li><i class="fa fa-envelope"></i> fayshinghardware@gmail.com</li>
+                                
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6">
+                        <div class="header__top__right">
+                            <div class="header__top__right__social">
+                                <a href="#"><i class="fa fa-facebook"></i></a>
+                                <a href="#"><i class="fa fa-twitter"></i></a>
+                                <a href="#"><i class="fa fa-linkedin"></i></a>
+                                <a href="#"><i class="fa fa-pinterest-p"></i></a>
+                            </div>
+                            
+                            <div class="header__top__right__auth">
+                                <a href="/login"><i class="fa fa-user"></i> Login</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-2">
+                    <div class="header__logo">
+                        <a href="/index"><img src="images/logo.png" alt=""></a>
+                    </div>
+                </div>
+                <div class="col-lg-10">
+                    <nav class="header__menu">
+                        <ul>
+                            <li ><a href="/index">Home</a></li>
+                            <li><a href="/shop">Shop</a></li>
+                            <li><a href="/pages">Pages</a>
+                                <ul class="header__menu__dropdown">
+                                    <li><a href="/shop_details">Shop Details</a></li>
+                                    <li> <a href="/cart" class="cart-link">Shopping Cart</a></li>
+                                    <li><a href="/check_out">Check Out</a></li>
+                                    <li><a href="/blog_details">Blog Details</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="/contact">Contact</a></li>
+                            <li><a href="/place_order">My Purchases</a></li>
+    
+                           <div class="header__cart" style="margin-top:-60;">
+                                    <ul>
+                                        <li><a href="cart"><i class="fa fa-shopping-bag"></i> <span>3</span></a></li>
+                                    </ul>
+                             </div>
+                               
+                        </ul>
+                    </nav>
+                </div>
+           
+            <div class="humberger__open">
+                <i class="fa fa-bars"></i>
+            </div> </div>
+        </div>
+    </header>
+    <!-- Header Section End -->
+    
+    <section class="breadcrumb-section" style="background-image: url('/images/breadcrumb.jpg'); background-repeat: no-repeat; background-size: cover; background-position: center;">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center p-5">
+                    <div class="breadcrumb__text">
+                        <h2 style="color: aliceblue;">Product Details</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <div class="container-checkout mt-4 mb-4">
+        <h2>Shipping Information</h2>
+        <% if (cartItems.length > 0) { %>
+            <p>User ID: <%= userDetails.UserID %></p>
+            <p>Name: <%= userDetails.FirstName %> <%= userDetails.MiddleName %> <%= userDetails.LastName %> <%= userDetails.Suffix %></p>
+            <p>Email: <%= userDetails.Email %></p>
+            <p>Contact Number: <%= userDetails.ContactNumber %></p>
+            <p>Address: <%= userDetails.Street %>, <%= userDetails.Barangay %>, <%= userDetails.City %>, <%= userDetails.Province %></p>
+    
+            <h3>Your Order</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product ID</th>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% let totalPrice = 0; %>
+                    <% cartItems.forEach(item => { %>
+                        <tr>
+                            <td><%= item.ProductID %></td>
+                            <td><%= item.ProductName %></td>
+                            <td><%= item.Quantity %></td>
+                            <td><%= item.Price && !isNaN(item.Price) ? item.Price.toFixed(2) : '0.00' %></td>
+                            <td><%= item.Price && !isNaN(item.Price) ? (item.Price * item.Quantity).toFixed(2) : '0.00' %></td>
+                        </tr>
+                        <% totalPrice += item.Price && !isNaN(item.Price) ? item.Price * item.Quantity : 0; %>
+                    <% }) %>
+                </tbody>
+                
+                <tfoot>
+                    <tr>
+                        <th colspan="4">Total Price</th>
+                        <th><%= totalPrice.toFixed(2) %></th>
+                    </tr>
+                </tfoot>
+            </table>
+            
+            <div class="total-price">
+                Total Price: <%= totalPrice.toFixed(2) %>
+            </div>
+
+            <form action="/place-order" method="POST">
+                <input type="hidden" name="userId" value="<%= userDetails.UserID %>">
+                <input type="hidden" name="cartItems" value='<%= JSON.stringify(cartItems) %>'>
+                <button class="none" type="submit">Place Order</button>
+            </form>
+            
+            <a class="none" href="/shop">Continue Shopping</a>
+        <% } else { %>
+            <p>No items in the cart.</p>
+        <% } %>
+    </div>
+
+    <!-- Footer Section Begin -->
+<footer class="footer spad">
+    <div class="container-fluid pl-5 pr-5">
+        <div class="row">
+            <div class="col-lg-3 col-md-5 col-sm-5 pl-5">
+                <div class="footer__about">
+                    <div class="footer__about__logo">
+                        <a href="/index"><img src="images/logo.png" style="border-radius: 50px;" alt=""></a>
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-1 col-sm-1 pl-1">
+                <div class="footer__about">
+                   
+                    <ul>
+                        <li>Address: Calapan City, Oriental Mindoro</li>
+                        <li>Phone: +65 11.188.888</li>
+                        <li>Email: hardware@gmail.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-1 col-sm-1 offset-lg-1">
+                <div class="footer__widget">
+                    <h6>Useful Links</h6>
+                    <ul>
+                        <li><a href="/about">About Us</a></li>
+            
+
+                        <li><a href="/contact">Contact</a></li>
+       
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-6 pr-2">
+                <div class="footer__widget">
+                    <h6>Join Our Newsletter Now</h6>
+                    <p>Get E-mail updates about our latest shop and special offers.</p>
+                    
+                    <div class="footer__widget__social">
+                        <a href="#"><i class="fa fa-facebook"></i></a>
+                        <a href="#"><i class="fa fa-instagram"></i></a>
+                        <a href="#"><i class="fa fa-twitter"></i></a>
+                        <a href="#"><i class="fa fa-pinterest"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="footer__copyright "style="text-align:center;">
+                   
+Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This ecommerce is made with <i class="fa fa-heart" aria-hidden="true"></i> 
+<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p></div>
+              
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- Footer Section End -->
+</body>
+</html>

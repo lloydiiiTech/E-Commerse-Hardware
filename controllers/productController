@@ -1,0 +1,202 @@
+
+
+const ProductModel = require('../models/productModel');
+
+const index = (req, res) => {
+    ProductModel.getAllProducts((err, products) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Error retrieving products. Please try again later.');
+        }
+
+
+        res.render('index', { products });
+    });
+};
+
+
+const addToCart = (req, res) => {
+    const { IdNum, Quantity } = req.body;
+    const ProductID = req.params.productID;
+
+    const cartData = {
+        Quantity,
+        IdNum,
+        ProductID
+    };
+
+    ProductModel.addToCart(cartData, (err) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Error adding to cart');
+        }
+        res.redirect('/'); 
+    });
+};
+
+const cart = (req, res) => {
+    const userId = 1; 
+    ProductModel.getProductCart(userId, (err, cartItems) => { 
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Error retrieving products. Please try again later.');
+        }
+
+        res.render('cart', { cartItems }); 
+    });
+};
+
+
+const deleteItemFromCart = async (req, res) => {
+    const cartId = req.params.cartId;
+
+    try {
+        await ProductModel.deleteCartItem(cartId);
+        res.redirect('/cart'); 
+    } catch (error) {
+        console.error('Error deleting item from cart:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
+// controllers/productController.js
+
+// Handles the checkout submission
+const checkout = async (req, res) => {
+    let selectedProducts = req.body.selectedProducts;
+    let quantities = req.body.quantities;
+    const userId = 1; // Replace with actual user ID logic
+
+    if (!Array.isArray(selectedProducts)) {
+        selectedProducts = [selectedProducts];
+    }
+
+    if (Array.isArray(quantities)) {
+        quantities = selectedProducts.reduce((obj, cartId, index) => {
+            obj[cartId] = quantities[index];
+            return obj;
+        }, {});
+    } else if (typeof quantities === 'string') {
+        quantities = { [selectedProducts[0]]: quantities };
+    }
+
+    if (!selectedProducts || selectedProducts.length === 0) {
+        return res.status(400).send('No products selected for checkout.');
+    }
+
+    try {
+        const insertPromises = selectedProducts.map(async cartId => {
+            const quantity = quantities[cartId];
+
+            if (!quantity || isNaN(quantity) || quantity <= 0) {
+                throw new Error(`Invalid quantity for cart item ID: ${cartId}`);
+            }
+
+            // Fetch the ProductID associated with the cartId (if necessary)
+            const productId = await ProductModel.getProductIdByCartId(cartId);
+
+            // Ensure productId is valid
+            if (!productId) {
+                throw new Error(`No product found for cart ID: ${cartId}`);
+            }
+
+            await ProductModel.updateCartQuantity(cartId, quantity, userId);
+            await ProductModel.clearReceipt();
+            return await ProductModel.insertReceipt(productId, quantity, userId); // Use productId here
+        });
+
+        await Promise.all(insertPromises);
+        res.redirect('/checkoutprocess'); // Redirect to the checkout process after successful submission
+    } catch (err) {
+        console.error('Error during checkout:', err.message);
+        res.status(500).send('An error occurred while processing your order.');
+    }
+};
+
+
+const checkoutCart = async (req, res) => {
+    
+    try {
+
+        
+
+        const detailedReceipts = await ProductModel.getAllReceipts();
+
+        // Log detailedReceipts for debugging
+        console.log('detailedReceipts:', detailedReceipts); 
+
+        // Check if there are receipts
+        if (detailedReceipts.length === 0) {
+            return res.render('checkout', { userDetails: {}, cartItems: [] });
+        }
+
+        // Extract user details from the first receipt, assuming all items share the same user information
+        const userDetails = {
+            Id: detailedReceipts[0].Id,
+            FirstName: detailedReceipts[0].FirstName,
+            MiddleName: detailedReceipts[0].MiddleName,
+            LastName: detailedReceipts[0].LastName,
+            Suffix: detailedReceipts[0].Suffix,
+            Email: detailedReceipts[0].Email,
+            ContactNumber: detailedReceipts[0].ContactNumber,
+            Province: detailedReceipts[0].Province,
+            City: detailedReceipts[0].City,
+            Barangay: detailedReceipts[0].Barangay,
+            Street: detailedReceipts[0].Street,
+            UserID: detailedReceipts[0].UserID // Ensure you have UserID
+        };
+
+        const cartItemsPromises = detailedReceipts.map(async (receipt) => {
+            const productDetails = await ProductModel.getProductDetailsById(receipt.ProductID);
+            return {
+                ProductID: receipt.ProductID, // Include ProductID here
+                ProductName: productDetails ? productDetails.ProductName : 'Unknown Product',
+                Quantity: receipt.Quantity,
+                Price: productDetails ? Number(productDetails.Price) : 0
+            };
+        });
+
+        const cartItems = await Promise.all(cartItemsPromises);
+
+        // Log cartItems for debugging
+        console.log('cartItems:', cartItems); 
+
+        // Render the 'checkout.ejs' template with user details and cart items
+        res.render('checkout', { userDetails, cartItems });
+    } catch (error) {
+        console.error('Error fetching checkout data:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+const placeOrder = async (req, res) => {
+    const { userId, cartItems } = req.body;
+
+    // Parse cartItems if it's a string
+    const items = typeof cartItems === 'string' ? JSON.parse(cartItems) : cartItems;
+
+    // Check if items is an array
+    if (!Array.isArray(items)) {
+        return res.status(400).send('Invalid cart items');
+    }
+
+    // Prepare promises for placing each order
+    const promises = items.map(item => {
+        return ProductModel.placeOrder(item.Quantity, item.ProductID, userId);
+    });
+
+    // Execute all promises
+    Promise.all(promises)
+        .then(async results => {
+            // Optional: Clear receipt after successful order placement
+            await ProductModel.clearReceipt();
+            res.redirect('/'); // Redirect to success page or return a response
+        })
+        .catch(error => {
+            console.error('Error placing orders:', error);
+            res.status(500).send('An error occurred while placing your order.');
+        });
+};
+
+
+
+module.exports = { addToCart, index, cart, deleteItemFromCart, checkout, checkoutCart, placeOrder };
